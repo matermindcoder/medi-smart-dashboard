@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Medi Smart Dashboard</title>
+<style>
+:root{--bg:#101827;--panel:#192538;--panel2:#22334b;--text:#edf4ff;--muted:#a9bad0;--accent:#42d6b2;--line:#31445e;--danger:#ff7b86}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top right,#203e58 0,#101827 48%);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1050px;margin:auto;padding:22px 16px 48px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#42d6b2,#58a6ff);display:grid;place-items:center;color:#09202a;font-size:23px;font-weight:900}
+h1{font-size:23px;margin:0} .sub{color:var(--muted);font-size:13px;margin-top:3px}
+.card{background:linear-gradient(160deg,#1b2a40,#172337);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 30px #0002}
+h2{font-size:17px;margin:0 0 14px}h3{font-size:15px;margin:0 0 10px;color:#c9f7ec}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+label{display:block;color:var(--muted);font-size:12px;margin:9px 0 5px}input,select{width:100%;padding:12px;border:1px solid #3a506d;border-radius:10px;background:#101c2c;color:var(--text);font:inherit;min-width:0}
+button{border:0;border-radius:11px;padding:12px 16px;background:var(--accent);color:#06251f;font-weight:750;font-size:14px;cursor:pointer;margin:5px 5px 5px 0}
+button.secondary{background:#30435d;color:var(--text)}button.danger{background:#56313c;color:#ffe6e8}
+button:disabled{opacity:.5;cursor:wait}.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.pill{font-size:12px;padding:6px 10px;border-radius:99px;background:#173f3a;color:#8df1d7}
+.note{color:var(--muted);font-size:13px;line-height:1.5}.hidden{display:none!important}.status{min-height:22px;color:#9eeed9;font-size:13px;margin-top:8px}.patient{border:1px solid var(--line);border-radius:14px;padding:14px;background:#142238}
+.session{border:1px solid var(--line);border-radius:13px;padding:12px;background:#142238}
+footer{color:#8195ad;font-size:12px;text-align:center;margin-top:22px}
+@media(max-width:650px){.grid,.three{grid-template-columns:1fr}main{padding:16px 12px 36px}h1{font-size:20px}}
+</style>
+</head>
+<body>
+<main>
+ <header class="top">
+  <div class="brand"><div class="logo">＋</div><div><h1>Medi Smart</h1><div class="sub">Patient schedules • Secure Firebase connection</div></div></div>
+  <div class="row"><span id="connection" class="pill">Not connected</span><button id="logoutBtn" class="secondary hidden">Sign out</button></div>
+ </header>
+
+ <section id="authCard" class="card">
+  <h2>Doctor / administrator sign in</h2>
+  <p class="note">Use the email and password for the Firebase account you already created. Only that account is currently authorized by your database rules. This page does not store your password.</p>
+  <div class="grid">
+   <div><label for="email">Email address</label><input id="email" type="email" autocomplete="username" placeholder="you@example.com"></div>
+   <div><label for="password">Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Your Firebase password"></div>
+  </div>
+  <div class="row"><button id="loginBtn">Sign in</button></div>
+  <div id="authStatus" class="status" role="status"></div>
+ </section>
+
+ <section id="app" class="hidden">
+  <section class="card">
+   <div class="row" style="justify-content:space-between"><div><h2>Patient profiles</h2><p class="note">Set up two patient profiles. These names and schedules are saved under your signed-in Firebase account.</p></div><span class="pill">Cloud database</span></div>
+   <div class="grid">
+    <div class="patient"><h3>Patient 1</h3><label for="p1name">Patient name</label><input id="p1name" placeholder="Enter patient 1 name"><button data-save="P1">Save patient 1</button></div>
+    <div class="patient"><h3>Patient 2</h3><label for="p2name">Patient name</label><input id="p2name" placeholder="Enter patient 2 name"><button data-save="P2">Save patient 2</button></div>
+   </div>
+  </section>
+  <section class="card">
+   <h2>Configure session times</h2>
+   <label for="patientSelect">Choose patient</label>
+   <select id="patientSelect"><option value="P1">Patient 1</option><option value="P2">Patient 2</option></select>
+   <div class="grid" style="margin-top:12px">
+    <div class="session"><h3>☀️ Morning medicine</h3><div class="grid"><div><label>Start time</label><input id="morningStart" type="time" value="08:30"></div><div><label>End time</label><input id="morningEnd" type="time" value="09:30"></div></div></div>
+    <div class="session"><h3>🌤️ Afternoon medicine</h3><div class="grid"><div><label>Start time</label><input id="afternoonStart" type="time" value="13:00"></div><div><label>End time</label><input id="afternoonEnd" type="time" value="14:00"></div></div></div>
+    <div class="session"><h3>🌙 Night medicine</h3><div class="grid"><div><label>Start time</label><input id="nightStart" type="time" value="19:00"></div><div><label>End time</label><input id="nightEnd" type="time" value="20:00"></div></div></div>
+    <div class="session"><h3>🩺 General checkup</h3><div class="grid"><div><label>Start time</label><input id="checkupStart" type="time" value="09:30"></div><div><label>End time</label><input id="checkupEnd" type="time" value="10:00"></div></div></div>
+   </div>
+   <div class="row" style="margin-top:12px"><button id="saveSchedule">Save this patient's schedule</button><button id="loadSchedule" class="secondary">Reload saved schedule</button></div>
+   <div id="dataStatus" class="status" role="status"></div>
+  </section>
+  <section class="card">
+   <h2>Next development steps</h2>
+   <p class="note">This first version saves patient names and session windows. The next stages will add daily pending/completed/missed logs, adherence graphs, theme controls, RFID-to-patient matching and ESP32 synchronization. A reminder or sensor event must be received before a dose is marked completed; this dashboard does not claim to detect swallowing.</p>
+  </section>
+ </section>
+ <footer>Medi Smart • Prototype dashboard • Use only for project testing, not medical decisions</footer>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCCUKBuXiaOUpJQZe7JJcrne_1FZ2g1AVA",
+  authDomain: "medi-smart-7.firebaseapp.com",
+  databaseURL: "https://medi-smart-7-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "medi-smart-7",
+  storageBucket: "medi-smart-7.firebasestorage.app",
+  messagingSenderId: "481434157991",
+  appId: "1:481434157991:web:1260dfc2ffbd5dbe826c82"
+};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth(), db=firebase.database();
+const $=id=>document.getElementById(id);
+const authCard=$("authCard"), app=$("app"), connection=$("connection");
+function base(){const u=auth.currentUser;if(!u)throw new Error("Please sign in first.");return db.ref("users/"+u.uid+"/mediSmart");}
+function showStatus(id,msg,isError=false){$(id).textContent=msg;$(id).style.color=isError?"#ff9ca5":"#9eeed9";}
+$("loginBtn").onclick=async()=>{try{showStatus("authStatus","Signing in…");await auth.signInWithEmailAndPassword($("email").value.trim(),$("password").value);showStatus("authStatus","Signed in.");}catch(e){showStatus("authStatus",e.message,true)}};
+
+$("logoutBtn").onclick=()=>auth.signOut();
+auth.onAuthStateChanged(async user=>{
+ authCard.classList.toggle("hidden",!!user);app.classList.toggle("hidden",!user);$("logoutBtn").classList.toggle("hidden",!user);
+ connection.textContent=user?"Connected as "+(user.email||"account"):"Not connected";
+ if(user){try{await loadPatientNames();await loadSchedule()}catch(e){showStatus("dataStatus",e.message,true)}}
+});
+async function loadPatientNames(){const s=await base().child("patients").once("value");const v=s.val()||{};$("p1name").value=v.P1?.name||"";$("p2name").value=v.P2?.name||"";}
+document.querySelectorAll("[data-save]").forEach(btn=>btn.onclick=async()=>{try{const id=btn.dataset.save;const name=$(id==="P1"?"p1name":"p2name").value.trim();if(!name)throw new Error("Enter a patient name first.");await base().child("patients/"+id+"/name").set(name);showStatus("dataStatus",name+" saved.");}catch(e){showStatus("dataStatus",e.message,true)}});
+const fields=["morningStart","morningEnd","afternoonStart","afternoonEnd","nightStart","nightEnd","checkupStart","checkupEnd"];
+async function loadSchedule(){try{const id=$("patientSelect").value;const s=await base().child("patients/"+id+"/schedule").once("value");const v=s.val()||{};for(const f of fields)$(f).value=v[f]||$(f).defaultValue;showStatus("dataStatus","Loaded schedule for "+id+".");}catch(e){showStatus("dataStatus",e.message,true)}}
+$("patientSelect").onchange=loadSchedule;$("loadSchedule").onclick=loadSchedule;
+$("saveSchedule").onclick=async()=>{try{const id=$("patientSelect").value;const schedule={};for(const f of fields)schedule[f]=$(f).value;if(schedule.morningStart>schedule.morningEnd||schedule.afternoonStart>schedule.afternoonEnd||schedule.nightStart>schedule.nightEnd||schedule.checkupStart>schedule.checkupEnd)throw new Error("For each session, the end time must be after the start time.");await base().child("patients/"+id+"/schedule").set(schedule);showStatus("dataStatus","Schedule saved to Firebase for "+id+".");}catch(e){showStatus("dataStatus",e.message,true)}};
+</script>
+</body>
+</html>
